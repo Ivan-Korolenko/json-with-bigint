@@ -8,23 +8,28 @@ JS library that allows you to easily serialize and deserialize data with BigInt 
 
 1. You need to convert some data to/from JSON and it includes BigInt values
 2. Native JSON.stringify() and JSON.parse() methods in JS can't work with BigInt
-3. Other libraries and pieces of code that you'll find can't solve this problem while supporting consistent round-trip operations (meaning, you will not get the same BigInt values if you serialize and then deserialize them)
+3. Other libraries and pieces of code that you'll find either can't solve this problem while supporting consistent round-trip operations (meaning, you will not get the same BigInt values if you serialize and then deserialize them) or requires you to change your JSON or the way you want to work with your data
 
 ## Good things about JSON-with-BigInt
 
 ✔️ Supports consistent round-trip operations with JSON
 
 ```
-JSONParse(JSONStringify(9007199254740991n)) === 9007199254740991n // true
+const data = { bigNumber: 9007199254740992n };
+JSONParse(JSONStringify(data)).bigNumber === 9007199254740992n // true
 ```
+
+✔️ No need to change your JSON or the way you want to work with your data
+
+✔️ Parses and stringifies all other values other than big numbers same way as native JSON methods in JS do
 
 ✔️ Does not contaminate your global space (unlike monkey-patching solution)
 
-✔️ You don't have to memorize this library's API, you already know it, just skip the dot and that's it
+✔️ You don't have to memorize this library's API, you already know it, just skip the dot, use camelCase and that's it (JSONParse(), JSONStringify())
 
 ✔️ Can be used in a TypeScript project (.d.ts file included)
 
-✔️ Size: 164 bytes (minified and gzipped)
+✔️ Size: 301 bytes (minified and gzipped)
 
 ✔️ No dependencies
 
@@ -46,7 +51,7 @@ and use it
 import { JSONParse, JSONStringify } from 'json-with-bigint';
 
 const userData = {
-  someBigNumber: 9007199254740991n
+  someBigNumber: 9007199254740992n
 };
 
 localStorage.setItem('userData', JSONStringify(userData));
@@ -67,7 +72,7 @@ and use it
 ```
 <script>
   const userData = {
-    someBigNumber: 9007199254740991n
+    someBigNumber: 9007199254740992n
   };
 
   localStorage.setItem('userData', JSONStringify(userData));
@@ -84,7 +89,7 @@ Download json-with-bigint.min.js from this repository to your project's folder a
 <script src="./json-with-bigint.min.js"></script>
 <script>
   const userData = {
-    someBigNumber: 9007199254740991n
+    someBigNumber: 9007199254740992n
   };
 
   localStorage.setItem('userData', JSONStringify(userData));
@@ -101,7 +106,7 @@ Download json-with-bigint.min.js from this repository to your project's folder a
 
 Examples:
 
-- `JSONParse('{"someBigNumber":9007199254740991n}')`
+- `JSONParse('{"someBigNumber":9007199254740992n}')`
 - `JSONStringify({
-someBigNumber: 9007199254740991n
+someBigNumber: 9007199254740992n
 })`
