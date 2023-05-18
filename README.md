@@ -16,6 +16,7 @@ JS library that allows you to easily serialize and deserialize data with BigInt 
 
 ```
 const data = { bigNumber: 9007199254740992n };
+JSONStringify(data) // '{"bigNumber":9007199254740992}'
 JSONParse(JSONStringify(data)).bigNumber === 9007199254740992n // true
 ```
 
@@ -29,7 +30,7 @@ JSONParse(JSONStringify(data)).bigNumber === 9007199254740992n // true
 
 ✔️ Can be used in a TypeScript project (.d.ts file included)
 
-✔️ Size: 301 bytes (minified and gzipped)
+✔️ Size: 424 bytes (minified and gzipped)
 
 ✔️ No dependencies
 

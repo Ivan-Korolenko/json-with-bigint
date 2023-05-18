@@ -1,18 +1,22 @@
 /* 
-  Function to serialize data to JSON string.
-  Converts all BigInt values to strings with "n" character at the end.
+  Function to serialize data to JSON string
+  Converts BigInt values to custom format (strings with "n" at the end) and then converts them to proper big integers in JSON string
 */
-export const JSONStringify = (data) =>
-  JSON.stringify(data, (_, value) =>
+export const JSONStringify = (data) => {
+  const bigInts = /([\[:])?"(\d+)n"([,\}\]])/g;
+  const preliminaryJSON = JSON.stringify(data, (_, value) =>
     typeof value === "bigint" ? value.toString() + "n" : value
   );
+  const finalJSON = preliminaryJSON.replace(bigInts, "$1$2$3");
+
+  return finalJSON;
+};
 
 /* 
-  Function to parse JSON.
-  If JSON has values in our custom format BigInt (strings with "n" character at the end), we just parse them to BigInt values.
-  If JSON has big number values, but not in our custom format, we copy it, and in a copy we convert those values to our custom format, 
-  then parse them to BigInt values.
-  Other values (not big numbers and not our custom format BigInt values) are not affected and parsed as native JSON.parse() would parse them.
+  Function to parse JSON
+  If JSON has values presented in a lib's custom format (strings with "n" character at the end), we just parse them to BigInt values (for backward compatibility with previous versions of the lib)
+  If JSON has values greater than Number.MAX_SAFE_INTEGER, we convert those values to our custom format, then parse them to BigInt values.
+  Other types of values are not affected and parsed as native JSON.parse() would parse them.
 */
 export const JSONParse = (json) => {
   /*
