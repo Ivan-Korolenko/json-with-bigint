@@ -1,4 +1,13 @@
-export type Json = string | number | bigint | boolean | JsonObject  | {} | JsonArray;
+export type Json =
+  | null
+  | undefined
+  | string  
+  | number
+  | bigint
+  | boolean
+  | JsonObject
+  | {}
+  | JsonArray;
 
 interface JsonObject {
   [x: string]: Json;
