@@ -57,7 +57,7 @@ const userData = {
 
 localStorage.setItem('userData', JSONStringify(userData));
 
-const restoredUserData = JSONParse(localStorage.getItem('userData'));
+const restoredUserData = JSONParse(localStorage.getItem('userData') || '');
 ```
 
 ### CDN
@@ -78,7 +78,7 @@ and use it
 
   localStorage.setItem('userData', JSONStringify(userData));
 
-  const restoredUserData = JSONParse(localStorage.getItem('userData'));
+  const restoredUserData = JSONParse(localStorage.getItem('userData') || '');
 </script>
 ```
 
@@ -95,7 +95,7 @@ Download json-with-bigint.min.js from this repository to your project's folder a
 
   localStorage.setItem('userData', JSONStringify(userData));
 
-  const restoredUserData = JSONParse(localStorage.getItem('userData'));
+  const restoredUserData = JSONParse(localStorage.getItem('userData') || '');
 </script>
 ```
 
