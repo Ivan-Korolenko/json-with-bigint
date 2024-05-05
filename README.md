@@ -24,6 +24,8 @@ JSONParse(JSONStringify(data)).bigNumber === 9007199254740992n // true
 
 ✔️ Parses and stringifies all other values other than big numbers same way as native JSON methods in JS do
 
+✔️ Correctly parses float numbers and negative numbers
+
 ✔️ Does not contaminate your global space (unlike monkey-patching solution)
 
 ✔️ You don't have to memorize this library's API, you already know it, just skip the dot, use camelCase and that's it (JSONParse(), JSONStringify())
