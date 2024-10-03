@@ -1,6 +1,6 @@
 {
   "name": "json-with-bigint",
-  "version": "2.1.3",
+  "version": "2.2.3",
   "description": "JS library that allows you to easily serialize and deserialize data with BigInt values",
   "type": "module",
   "exports": "./json-with-bigint.js",

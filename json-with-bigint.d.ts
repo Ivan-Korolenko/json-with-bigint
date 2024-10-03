@@ -1,7 +1,7 @@
 export type Json =
   | null
   | undefined
-  | string  
+  | string
   | number
   | bigint
   | boolean
@@ -15,6 +15,6 @@ interface JsonObject {
 
 interface JsonArray extends Array<Json> {}
 
-export function JSONStringify(data: Json): string;
+export function JSONStringify(data: Json, space?: string | number): string;
 
 export function JSONParse<T extends Json = Json>(serializedData: string): T;
