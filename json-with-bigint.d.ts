@@ -1,3 +1,9 @@
+type JsonObject = {
+  [x: string]: Json;
+};
+
+type JsonArray = Json[];
+
 export type Json =
   | null
   | undefined
@@ -9,12 +15,14 @@ export type Json =
   | {}
   | JsonArray;
 
-interface JsonObject {
-  [x: string]: Json;
-}
+export function JSONStringify(
+  data: Exclude<Json, undefined>,
+  space?: string | number
+): string;
 
-interface JsonArray extends Array<Json> {}
-
-export function JSONStringify(data: Json, space?: string | number): string;
+export function JSONStringify(
+  data: undefined,
+  space?: string | number
+): undefined;
 
 export function JSONParse<T extends Json = Json>(serializedData: string): T;
