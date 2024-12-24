@@ -22,17 +22,19 @@ JSONParse(JSONStringify(data)).bigNumber === 9007199254740992n // true
 
 ✔️ No need to change your JSON or the way you want to work with your data
 
-✔️ Parses and stringifies all other values other than big numbers same way as native JSON methods in JS do
+✔️ Parses and stringifies all other values other than big numbers the same way as native JSON methods in JS do
 
 ✔️ Correctly parses float numbers and negative numbers
 
+✔️ Correctly parses pretty printed JSON (formatted with newline and whitespace characters)
+
 ✔️ Does not contaminate your global space (unlike monkey-patching solution)
 
-✔️ You don't have to memorize this library's API, you already know it, just skip the dot, use camelCase and that's it (JSONParse(), JSONStringify())
+✔️ You don't have to memorize this library's API, you already know it. Just skip the dot, use camelCase and that's it (JSONParse(), JSONStringify())
 
-✔️ Can be used in a TypeScript project (.d.ts file included)
+✔️ Can be used in both JavaScript and TypeScript projects (.d.ts file included)
 
-✔️ Size: 424 bytes (minified and gzipped)
+✔️ Size: 762 bytes (minified and gzipped)
 
 ✔️ No dependencies
 
