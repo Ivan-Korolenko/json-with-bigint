@@ -111,7 +111,7 @@ Download json-with-bigint.min.js from this repository to your project's folder a
 
 Examples:
 
-- `JSONParse('{"someBigNumber":9007199254740992n}')`
+- `JSONParse('{"someBigNumber":9007199254740992}')`
 - `JSONStringify({
 someBigNumber: 9007199254740992n
 })`
