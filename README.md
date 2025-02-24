@@ -8,7 +8,7 @@ JS library that allows you to easily serialize and deserialize data with BigInt 
 
 1. You need to convert some data to/from JSON and it includes BigInt values
 2. Native JSON.stringify() and JSON.parse() methods in JS can't work with BigInt
-3. Other libraries and pieces of code that you'll find either can't solve this problem while supporting consistent round-trip operations (meaning, you will not get the same BigInt values if you serialize and then deserialize them) or requires you to change your JSON or the way you want to work with your data
+3. Other libraries and pieces of code that you'll find either can't solve this problem while supporting consistent round-trip operations (meaning, you will not get the same BigInt values if you serialize and then deserialize them) or requires you to specify which properties in JSON include BigInt values, or to change your JSON or the way you want to work with your data
 
 ## Good things about JSON-with-BigInt
 
@@ -20,9 +20,13 @@ JSONStringify(data) // '{"bigNumber":9007199254740992}'
 JSONParse(JSONStringify(data)).bigNumber === 9007199254740992n // true
 ```
 
+✔️ No need to specify which properties in JSON include BigInt values. Library will find them itself
+
 ✔️ No need to change your JSON or the way you want to work with your data
 
-✔️ Parses and stringifies all other values other than big numbers the same way as native JSON methods in JS do
+✔️ You don't have to memorize this library's API, you already know it. Just skip the dot, use camelCase and that's it (JSONParse(), JSONStringify())
+
+✔️ Parses and stringifies all other values other than big numbers the same way as native JSON methods in JS do. You can just replace every `JSON.parse` and `JSON.stringify` call in your project with functions from this library and it'll work.
 
 ✔️ Correctly parses float numbers and negative numbers
 
@@ -30,13 +34,15 @@ JSONParse(JSONStringify(data)).bigNumber === 9007199254740992n // true
 
 ✔️ Does not contaminate your global space (unlike monkey-patching solution)
 
-✔️ You don't have to memorize this library's API, you already know it. Just skip the dot, use camelCase and that's it (JSONParse(), JSONStringify())
-
 ✔️ Can be used in both JavaScript and TypeScript projects (.d.ts file included)
 
-✔️ Size: 762 bytes (minified and gzipped)
+✔️ Can be used as both ESM and CommonJS module
+
+✔️ Size: 624 bytes (minified and gzipped)
 
 ✔️ No dependencies
+
+✔️ Covered by tests
 
 ## Getting Started
 
