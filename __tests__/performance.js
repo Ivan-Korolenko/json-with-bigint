@@ -5,6 +5,8 @@ const { JSONParse, JSONStringify } = require("../json-with-bigint.cjs");
 const fs = require("fs").promises;
 const https = require("https");
 
+// JSON is located in a separate GitHub repo here (click Raw to see the URL below):
+// https://github.com/Ivan-Korolenko/json-with-bigint.performance.json/blob/main/performance.json
 const JSON_URL =
   "https://raw.githubusercontent.com/Ivan-Korolenko/json-with-bigint.performance.json/refs/heads/main/performance.json";
 const JSON_LOCAL_FILEPATH = "__tests__/performance.json";
