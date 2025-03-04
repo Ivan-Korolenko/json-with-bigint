@@ -24,7 +24,7 @@ JSONParse(JSONStringify(data)).bigNumber === 9007199254740992n // true
 
 ✔️ No need to change your JSON or the way you want to work with your data
 
-✔️ You don't have to memorize this library's API, you already know it. Just skip the dot, use camelCase and that's it (JSONParse(), JSONStringify())
+✔️ You don't have to memorize this library's API, you already know it. Just skip the dot, and that's it (JSONParse(), JSONStringify())
 
 ✔️ Parses and stringifies all other values other than big numbers the same way as native JSON methods in JS do. You can just replace every `JSON.parse` and `JSON.stringify` call in your project with functions from this library and it'll work.
 
@@ -33,6 +33,8 @@ JSONParse(JSONStringify(data)).bigNumber === 9007199254740992n // true
 ✔️ Correctly parses pretty printed JSON (formatted with newline and whitespace characters)
 
 ✔️ Does not contaminate your global space (unlike monkey-patching solution)
+
+✔️ Isomorphic (it can run in both the browser and Node.js with the same code)
 
 ✔️ Can be used in both JavaScript and TypeScript projects (.d.ts file included)
 
