@@ -7,6 +7,16 @@ const noiseValue = /^-?\d+n+$/; // Noise - strings that match the custom format 
 const JSONStringify = (data, space) => {
   if (!data) return JSON.stringify(data);
 
+  if ("rawJSON" in JSON) {
+    return JSON.stringify(
+      data,
+      (_, value) => {
+        return typeof value === "bigint" ? JSON.rawJSON(value.toString()) : value
+      },
+      space
+    );
+  }
+
   const bigInts = /([\[:])?"(-?\d+)n"($|[,\}\]])/g;
   const noise = /([\[:])?("-?\d+n+)n("$|"[,\}\]])/g;
   const convertedToCustomJSON = JSON.stringify(
