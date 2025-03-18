@@ -5,8 +5,6 @@ const noiseValue = /^-?\d+n+$/; // Noise - strings that match the custom format 
   Converts BigInt values to a custom format (strings with digits and "n" at the end) and then converts them to proper big integers in a JSON string.
 */
 export const JSONStringify = (data, space) => {
-  if (!data) return JSON.stringify(data);
-
   if ("rawJSON" in JSON) {
     return JSON.stringify(
       data,
@@ -16,6 +14,8 @@ export const JSONStringify = (data, space) => {
       space
     );
   }
+
+  if (!data) return JSON.stringify(data);
 
   const bigInts = /([\[:])?"(-?\d+)n"($|[,\}\]])/g;
   const noise = /([\[:])?("-?\d+n+)n("$|"[,\}\]])/g;
