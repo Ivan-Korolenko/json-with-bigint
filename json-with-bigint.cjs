@@ -1,4 +1,6 @@
 const noiseValue = /^-?\d+n+$/; // Noise - strings that match the custom format before being converted to it
+const originalStringify = JSON.stringify;
+const originalParse = JSON.parse;
 
 /* 
   Function to serialize data to a JSON string.
@@ -6,7 +8,7 @@ const noiseValue = /^-?\d+n+$/; // Noise - strings that match the custom format 
 */
 const JSONStringify = (data, space) => {
   if ("rawJSON" in JSON) {
-    return JSON.stringify(
+    return originalStringify(
       data,
       (_, value) => {
         return typeof value === "bigint" ? JSON.rawJSON(value.toString()) : value
@@ -15,11 +17,11 @@ const JSONStringify = (data, space) => {
     );
   }
 
-  if (!data) return JSON.stringify(data);
+  if (!data) return originalStringify(data);
 
   const bigInts = /([\[:])?"(-?\d+)n"($|[,\}\]])/g;
   const noise = /([\[:])?("-?\d+n+)n("$|"[,\}\]])/g;
-  const convertedToCustomJSON = JSON.stringify(
+  const convertedToCustomJSON = originalStringify(
     data,
     (_, value) => {
       const isNoise =
@@ -43,7 +45,7 @@ const JSONStringify = (data, space) => {
   Other types of values are not affected and parsed as native JSON.parse() would parse them.
 */
 const JSONParse = (json) => {
-  if (!json) return JSON.parse(json);
+  if (!json) return originalParse(json);
 
   const MAX_INT = Number.MAX_SAFE_INTEGER.toString();
   const MAX_DIGITS = MAX_INT.length;
@@ -75,7 +77,7 @@ const JSONParse = (json) => {
   );
 
   // Convert marked big numbers to BigInt
-  return JSON.parse(serializedData, (_, value) => {
+  return originalParse(serializedData, (_, value) => {
     const isCustomFormatBigInt =
       typeof value === "string" && Boolean(value.match(customFormat));
 
