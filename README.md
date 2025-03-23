@@ -40,7 +40,7 @@ JSONParse(JSONStringify(data)).bigNumber === 9007199254740992n // true
 
 ✔️ Can be used as both ESM and CommonJS module
 
-✔️ Size: 660 bytes (minified and gzipped)
+✔️ Size: 684 bytes (minified and gzipped)
 
 ✔️ No dependencies
 
