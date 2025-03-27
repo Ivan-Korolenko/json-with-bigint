@@ -2,7 +2,7 @@ const noiseValue = /^-?\d+n+$/; // Noise - strings that match the custom format 
 const originalStringify = JSON.stringify;
 const originalParse = JSON.parse;
 
-/* 
+/*
   Function to serialize value to a JSON string.
   Converts BigInt values to a custom format (strings with digits and "n" at the end) and then converts them to proper big integers in a JSON string.
 */
@@ -51,7 +51,7 @@ export const JSONStringify = (value, replacer, space) => {
   return denoisedJSON;
 };
 
-/* 
+/*
   Function to parse JSON.
   If JSON has number values greater than Number.MAX_SAFE_INTEGER, we convert those values to a custom format, then parse them to BigInt values.
   Other types of values are not affected and parsed as native JSON.parse() would parse them.
