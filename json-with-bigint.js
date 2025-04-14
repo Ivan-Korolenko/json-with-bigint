@@ -11,13 +11,13 @@ export const JSONStringify = (value, replacer, space) => {
     return originalStringify(
       value,
       (key, value) => {
-        if (typeof value === "bigint") return JSON.rawJSON(value.toString())
+        if (typeof value === "bigint") return JSON.rawJSON(value.toString());
 
-        if (typeof replacer === "function") return replacer(key, value)
+        if (typeof replacer === "function") return replacer(key, value);
 
-        if (Array.isArray(replacer) && replacer.includes(key)) return value
+        if (Array.isArray(replacer) && replacer.includes(key)) return value;
 
-        return value
+        return value;
       },
       space
     );
@@ -25,7 +25,7 @@ export const JSONStringify = (value, replacer, space) => {
 
   if (!value) return originalStringify(value, replacer, space);
 
-  const bigInts = /([\[:])?"(-?\d+)n"($|[,\}\]])/g;
+  const bigInts = /([\[:])?"(-?\d+)n"($|([\\n]|\s)*(\s|[\\n])*[,\}\]])/g;
   const noise = /([\[:])?("-?\d+n+)n("$|"[,\}\]])/g;
   const convertedToCustomJSON = originalStringify(
     value,

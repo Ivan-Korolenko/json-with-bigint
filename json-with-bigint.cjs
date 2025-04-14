@@ -25,7 +25,7 @@ const JSONStringify = (value, replacer, space) => {
 
   if (!value) return originalStringify(value, replacer, space);
 
-  const bigInts = /([\[:])?"(-?\d+)n"($|[,\}\]])/g;
+  const bigInts = /([\[:])?"(-?\d+)n"($|([\\n]|\s)*(\s|[\\n])*[,\}\]])/g;
   const noise = /([\[:])?("-?\d+n+)n("$|"[,\}\]])/g;
   const convertedToCustomJSON = originalStringify(
     value,
