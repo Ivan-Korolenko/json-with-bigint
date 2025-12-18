@@ -52,12 +52,53 @@ const JSONStringify = (value, replacer, space) => {
 };
 
 /*
+  Function to check if the JSON.parse's context.source feature is supported.
+*/
+const isContextSourceSupported = () => {
+  let supported = false;
+
+  JSON.parse('{"test": 1}', (key, value, context) => {
+    if (key === "test" && context && context.source === "1") {
+      supported = true;
+    }
+    return value;
+  });
+
+  return supported;
+};
+
+/*
+  Faster (2x) and simpler function to parse JSON.
+  Based on JSON.parse's context.source feature, which is not universally available now.
+  Does not support the legacy custom format, used in the first version of this library.
+*/
+const JSONParseV2 = (text, reviver) => {
+  const intRegex = /^-?\d+$/;
+
+  return JSON.parse(text, (key, value, context) => {
+    const isBigNumber =
+      typeof value === "number" &&
+      (value > Number.MAX_SAFE_INTEGER || value < Number.MIN_SAFE_INTEGER);
+    const isInt = intRegex.test(context.source);
+    const isBigInt = isBigNumber && isInt;
+
+    if (isBigInt) return BigInt(context.source);
+
+    if (typeof reviver !== "function") return value;
+
+    return reviver(key, value, context);
+  });
+};
+
+/*
   Function to parse JSON.
   If JSON has number values greater than Number.MAX_SAFE_INTEGER, we convert those values to a custom format, then parse them to BigInt values.
   Other types of values are not affected and parsed as native JSON.parse() would parse them.
 */
 const JSONParse = (text, reviver) => {
   if (!text) return originalParse(text, reviver);
+
+  if (isContextSourceSupported()) return JSONParseV2(text, reviver); // Shortcut to a faster (2x) and simpler version
 
   const MAX_INT = Number.MAX_SAFE_INTEGER.toString();
   const MAX_DIGITS = MAX_INT.length;

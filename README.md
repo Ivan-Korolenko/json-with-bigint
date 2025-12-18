@@ -2,7 +2,7 @@
 
 JS library that allows you to easily serialize and deserialize data with BigInt values
 
-## Why would I need JSON-with-BigInt?
+## Why would I need json-with-bigint?
 
 3 reasons:
 
@@ -10,7 +10,7 @@ JS library that allows you to easily serialize and deserialize data with BigInt 
 2. Native JSON.stringify() and JSON.parse() methods in JS can't work with BigInt
 3. Other libraries and pieces of code that you'll find either can't solve this problem while supporting consistent round-trip operations (meaning, you will not get the same BigInt values if you serialize and then deserialize them) or requires you to specify which properties in JSON include BigInt values, or to change your JSON or the way you want to work with your data
 
-## Good things about JSON-with-BigInt
+## json-with-bigint advantages
 
 ✔️ Supports consistent round-trip operations with JSON
 
@@ -26,7 +26,7 @@ JSONParse(JSONStringify(data)).bigNumber === 9007199254740992n // true
 
 ✔️ You don't have to memorize this library's API, you already know it. Just skip the dot, and that's it (`JSONParse()`, `JSONStringify()`)
 
-✔️ Parses and stringifies all other values other than big numbers the same way as native JSON methods in JS do. Signatures match too. You can just replace every `JSON.parse()` and `JSON.strinfigy()` in your project with `JSONParse()` and `JSONStringify()`, and it will work
+✔️ Parsed big number values are just regular BigInt. Parses and stringifies all other values other than big numbers the same way as native JSON methods in JS do. Signatures match too. You can just replace every `JSON.parse()` and `JSON.strinfigy()` in your project with `JSONParse()` and `JSONStringify()`, and it will work
 
 ✔️ Correctly parses float numbers and negative numbers
 
@@ -40,11 +40,15 @@ JSONParse(JSONStringify(data)).bigNumber === 9007199254740992n // true
 
 ✔️ Can be used as both ESM and CommonJS module
 
-✔️ Size: 776 bytes (minified and gzipped)
+✔️ No transpilers needed. Runs even in ES5 environments
 
-✔️ No dependencies
+✔️ Actively supported
 
-✔️ Covered by tests
+✔️ Size: 988 bytes (minified and gzipped)
+
+✔️ No dependencies. Even the dev ones
+
+✔️ Extensively covered by tests
 
 ## Getting Started
 

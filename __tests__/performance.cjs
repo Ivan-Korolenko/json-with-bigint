@@ -1,4 +1,6 @@
 // ------ Performance tests ------
+// To test both JSONParseV2() and JSONParse(), switch Node.js version (latest vs something old, like 12.3.0)
+
 const { performance } = require("perf_hooks");
 const { JSONParse, JSONStringify } = require("../json-with-bigint.cjs");
 

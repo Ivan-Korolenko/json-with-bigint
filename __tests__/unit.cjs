@@ -1,4 +1,6 @@
 // ------ Unit tests ------
+// To test both JSONParseV2() and JSONParse(), switch Node.js version (latest vs something old, like 12.3.0)
+
 const assert = require("assert");
 const { JSONStringify, JSONParse } = require("../json-with-bigint.cjs");
 
