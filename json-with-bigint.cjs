@@ -54,18 +54,8 @@ const JSONStringify = (value, replacer, space) => {
 /*
   Function to check if the JSON.parse's context.source feature is supported.
 */
-const isContextSourceSupported = () => {
-  let supported = false;
-
-  JSON.parse('{"test": 1}', (key, value, context) => {
-    if (key === "test" && context && context.source === "1") {
-      supported = true;
-    }
-    return value;
-  });
-
-  return supported;
-};
+const isContextSourceSupported = () =>
+  JSON.parse("1", (_, __, context) => !!context && context.source === "1");
 
 /*
   Faster (2x) and simpler function to parse JSON.
