@@ -1,7 +1,7 @@
 // ------ Performance tests ------
-// To test both JSONParseV2() and JSONParse(), switch Node.js version (latest vs something old, like 12.3.0)
 
 const { performance } = require("perf_hooks");
+const { imitateJSONParseWithoutContext } = require("./helpers.cjs");
 const { JSONParse, JSONStringify } = require("../json-with-bigint.cjs");
 
 const fs = require("fs").promises;
@@ -124,9 +124,7 @@ const measureExecTime = (fn) => {
   console.log("Time: ", endTime - startTime);
 };
 
-async function main() {
-  const data = await readPerformanceJSON(JSON_LOCAL_FILEPATH, "utf8");
-
+const runTests = (data) => {
   measureExecTime(() => {
     console.log("___________");
     console.log("Performance test. One-way");
@@ -138,6 +136,18 @@ async function main() {
     console.log("Performance test. Round-trip");
     JSONStringify(JSONParse(data));
   });
+};
+
+async function main() {
+  const data = await readPerformanceJSON(JSON_LOCAL_FILEPATH, "utf8");
+
+  console.log("------ V2 performance tests ------");
+  runTests(data);
+
+  JSON.parse = imitateJSONParseWithoutContext;
+
+  console.log("\n------ V1 (without context.source) performance tests ------");
+  runTests(data);
 }
 
 main();

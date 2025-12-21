@@ -1,7 +1,7 @@
 // ------ Unit tests ------
-// To test both JSONParseV2() and JSONParse(), switch Node.js version (latest vs something old, like 12.3.0)
 
 const assert = require("assert");
+const { imitateJSONParseWithoutContext } = require("./helpers.cjs");
 const { JSONStringify, JSONParse } = require("../json-with-bigint.cjs");
 
 const test1JSON = `{"zero":9007199254740998,"one":-42,"two":-9007199254740998,"test":["He was\\":[-23432432432434324324324324]",111,9007199254740998,{"test2":-9007199254740998}],"test3":["He was:[-23432432432434324324324324]",111,9007199254740998,{"test2":-9007199254740998,"float":1.9007199254740998,"float2":0.1,"float3":2.9007199254740996,"int":1,"int2":3243243432432434324324324}],"float4":[1.9007199254740998,1111111111111111111111111111111111,0.1,1,54354654654654654654656546546546546]}`;
@@ -106,42 +106,52 @@ const test7Obj = [
 const test8Obj = { uid: BigInt("1308537228663099396") };
 const test8JSON = '{\n  "uid": 1308537228663099396\n}';
 
-assert.deepStrictEqual(JSONParse(test1JSON), test1Obj);
-console.log("1 test passed");
-assert.deepStrictEqual(JSONStringify(JSONParse(test1JSON)), test1JSON);
-console.log("1 test round-trip passed");
+const runTests = () => {
+  assert.deepStrictEqual(JSONParse(test1JSON), test1Obj);
+  console.log("1 test passed");
+  assert.deepStrictEqual(JSONStringify(JSONParse(test1JSON)), test1JSON);
+  console.log("1 test round-trip passed");
 
-assert.deepStrictEqual(JSONParse(test2JSON), test2Obj);
-console.log("2 test passed");
-assert.deepStrictEqual(JSONStringify(JSONParse(test2JSON)), test2TersedJSON);
-console.log("2 test round-trip passed");
+  assert.deepStrictEqual(JSONParse(test2JSON), test2Obj);
+  console.log("2 test passed");
+  assert.deepStrictEqual(JSONStringify(JSONParse(test2JSON)), test2TersedJSON);
+  console.log("2 test round-trip passed");
 
-assert.deepStrictEqual(JSONParse(test3JSON), test3Obj);
-console.log("3 test passed");
-assert.deepStrictEqual(JSONStringify(JSONParse(test3JSON)), test3JSON);
-console.log("3 test round-trip passed");
+  assert.deepStrictEqual(JSONParse(test3JSON), test3Obj);
+  console.log("3 test passed");
+  assert.deepStrictEqual(JSONStringify(JSONParse(test3JSON)), test3JSON);
+  console.log("3 test round-trip passed");
 
-assert.deepStrictEqual(JSONParse(test4JSON), test4Obj);
-console.log("4 test passed");
-assert.deepStrictEqual(JSONStringify(JSONParse(test4JSON)), test4JSON);
-console.log("4 test round-trip passed");
+  assert.deepStrictEqual(JSONParse(test4JSON), test4Obj);
+  console.log("4 test passed");
+  assert.deepStrictEqual(JSONStringify(JSONParse(test4JSON)), test4JSON);
+  console.log("4 test round-trip passed");
 
-assert.deepStrictEqual(JSONParse(test5JSON), test5Obj);
-console.log("5 test passed");
-assert.deepStrictEqual(JSONStringify(JSONParse(test5JSON)), test5JSON);
-console.log("5 test round-trip passed");
+  assert.deepStrictEqual(JSONParse(test5JSON), test5Obj);
+  console.log("5 test passed");
+  assert.deepStrictEqual(JSONStringify(JSONParse(test5JSON)), test5JSON);
+  console.log("5 test round-trip passed");
 
-assert.deepStrictEqual(JSONParse(test6JSON), test6Obj);
-console.log("6 test passed");
-assert.deepStrictEqual(JSONStringify(JSONParse(test6JSON)), test6JSON);
-console.log("6 test round-trip passed");
+  assert.deepStrictEqual(JSONParse(test6JSON), test6Obj);
+  console.log("6 test passed");
+  assert.deepStrictEqual(JSONStringify(JSONParse(test6JSON)), test6JSON);
+  console.log("6 test round-trip passed");
 
-assert.deepStrictEqual(JSONParse(test7JSON), test7Obj);
-console.log("7 test passed");
-assert.deepStrictEqual(JSONStringify(JSONParse(test7JSON)), test7JSON);
-console.log("7 test round-trip passed");
+  assert.deepStrictEqual(JSONParse(test7JSON), test7Obj);
+  console.log("7 test passed");
+  assert.deepStrictEqual(JSONStringify(JSONParse(test7JSON)), test7JSON);
+  console.log("7 test round-trip passed");
 
-assert.deepStrictEqual(JSONStringify(test8Obj, null, 2), test8JSON);
-console.log("8 test passed");
-assert.deepStrictEqual(JSONParse(JSONStringify(test8Obj, null, 2)), test8Obj);
-console.log("8 test round-trip passed");
+  assert.deepStrictEqual(JSONStringify(test8Obj, null, 2), test8JSON);
+  console.log("8 test passed");
+  assert.deepStrictEqual(JSONParse(JSONStringify(test8Obj, null, 2)), test8Obj);
+  console.log("8 test round-trip passed");
+};
+
+console.log("------ V2 unit tests ------");
+runTests();
+
+JSON.parse = imitateJSONParseWithoutContext;
+
+console.log("\n------ V1 (without context.source) unit tests ------");
+runTests();
