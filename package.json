@@ -9,8 +9,11 @@
     "require": "./json-with-bigint.cjs"
   },
   "scripts": {
-    "performance": "node __tests__/performance.cjs",
-    "unit": "node __tests__/unit.cjs"
+    "test": "npm run unit:cjs && npm run unit:esm",
+    "performance:cjs": "node __tests__/performance.cjs",
+    "unit:cjs": "node __tests__/unit.cjs",
+    "performance:esm": "node __tests__/performance.cjs",
+    "unit:esm": "node __tests__/unit.cjs"
   },
   "repository": {
     "type": "git",
