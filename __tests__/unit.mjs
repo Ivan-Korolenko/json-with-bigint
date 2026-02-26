@@ -2,7 +2,7 @@
 
 import { deepStrictEqual } from "assert";
 import { imitateJSONParseWithoutContext } from "./helpers.cjs";
-import { JSONStringify, JSONParse } from "../json-with-bigint.cjs";
+import { JSONStringify, JSONParse } from "../json-with-bigint.js";
 
 const test1JSON = `{"zero":9007199254740998,"one":-42,"two":-9007199254740998,"test":["He was\\":[-23432432432434324324324324]",111,9007199254740998,{"test2":-9007199254740998}],"test3":["He was:[-23432432432434324324324324]",111,9007199254740998,{"test2":-9007199254740998,"float":1.9007199254740998,"float2":0.1,"float3":2.9007199254740996,"int":1,"int2":3243243432432434324324324}],"float4":[1.9007199254740998,1111111111111111111111111111111111,0.1,1,54354654654654654654656546546546546]}`;
 const test1Obj = {
