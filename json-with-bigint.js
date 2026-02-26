@@ -9,8 +9,12 @@ const noiseStringify = /([\[:])?("-?\d+n+)n("$|"([\\n]|\s)*(\s|[\\n])*[,\}\]])/g
 /**
  * Function to serialize value to a JSON string.
  * Converts BigInt values to a custom format (strings with digits and "n" at the end) and then converts them to proper big integers in a JSON string.
+ * @param {*} value - The value to convert to a JSON string.
+ * @param {function|array} [replacer] - The replacer parameter for JSON.stringify.
+ * @param {string|number} [space] - The space parameter for JSON.stringify.
+ * @returns {string} The JSON string representation of the value, with BigInt values properly converted.
  */
-export const JSONStringify = (value, replacer, space) => {
+const JSONStringify = (value, replacer, space) => {
   if ("rawJSON" in JSON) {
     return originalStringify(
       value,
@@ -60,11 +64,11 @@ export const JSONStringify = (value, replacer, space) => {
 const contextSourceSupported = (() =>
   JSON.parse("1", (_, __, context) => !!context && context.source === "1"))();
 
-/*
-  Faster (2x) and simpler function to parse JSON.
-  Based on JSON.parse's context.source feature, which is not universally available now.
-  Does not support the legacy custom format, used in the first version of this library.
-*/
+/**
+ * Faster (2x) and simpler function to parse JSON.
+ * Based on JSON.parse's context.source feature, which is not universally available now.
+ * Does not support the legacy custom format, used in the first version of this library.
+ */
 const JSONParseV2 = (text, reviver) => {
   return JSON.parse(text, (key, value, context) => {
     const isBigNumber =
@@ -88,12 +92,12 @@ const JSONParseV2 = (text, reviver) => {
   const noiseValueWithQuotes = /^"-?\d+n+"$/; // Noise - strings that match the custom format before being converted to it
   const customFormat = /^-?\d+n$/;
 
-/*
-  Function to parse JSON.
-  If JSON has number values greater than Number.MAX_SAFE_INTEGER, we convert those values to a custom format, then parse them to BigInt values.
-  Other types of values are not affected and parsed as native JSON.parse() would parse them.
-*/
-export const JSONParse = (text, reviver) => {
+/**
+ * Function to parse JSON.
+ * If JSON has number values greater than Number.MAX_SAFE_INTEGER, we convert those values to a custom format, then parse them to BigInt values.
+ * Other types of values are not affected and parsed as native JSON.parse() would parse them.
+  */
+const JSONParse = (text, reviver) => {
   if (!text) return originalParse(text, reviver);
 
   if (contextSourceSupported) return JSONParseV2(text, reviver); // Shortcut to a faster (2x) and simpler version
@@ -138,3 +142,5 @@ export const JSONParse = (text, reviver) => {
     return reviver(key, value, context);
   });
 };
+
+export { JSONStringify, JSONParse };
