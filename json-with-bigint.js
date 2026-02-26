@@ -6,6 +6,8 @@ const originalParse = JSON.parse;
 const bigIntsStringify = /([\[:])?"(-?\d+)n"($|([\\n]|\s)*(\s|[\\n])*[,\}\]])/g;
 const noiseStringify = /([\[:])?("-?\d+n+)n("$|"([\\n]|\s)*(\s|[\\n])*[,\}\]])/g;
 
+/** @typedef {(key: string, value: any, context?: { source: string }) => any} Reviver */
+
 /**
  * Function to serialize value to a JSON string.
  * Converts BigInt values to a custom format (strings with digits and "n" at the end) and then converts them to proper big integers in a JSON string.
@@ -64,6 +66,27 @@ const JSONStringify = (value, replacer, space) => {
 const contextSourceSupported = (() =>
   JSON.parse("1", (_, __, context) => !!context && context.source === "1"))();
 
+/** 
+ * Convert marked big numbers to BigInt
+ * @type {Reviver}
+ */
+function convertMarkedBigIntsReviver(key, value, context) {
+    const isCustomFormatBigInt =
+      typeof value === "string" && Boolean(value.match(customFormat));
+
+    if (isCustomFormatBigInt)
+      return BigInt(value.substring(0, value.length - 1));
+
+    const isNoiseValue =
+      typeof value === "string" && Boolean(value.match(noiseValue));
+
+    if (isNoiseValue) return value.substring(0, value.length - 1); // Remove one "n" off the end of the noisy string
+
+    if (typeof reviver !== "function") return value;
+
+    return reviver(key, value, context);
+  }
+
 /**
  * Faster (2x) and simpler function to parse JSON.
  * Based on JSON.parse's context.source feature, which is not universally available now.
@@ -74,7 +97,7 @@ const JSONParseV2 = (text, reviver) => {
     const isBigNumber =
       typeof value === "number" &&
       (value > Number.MAX_SAFE_INTEGER || value < Number.MIN_SAFE_INTEGER);
-    const isInt = intRegex.test(context.source);
+    const isInt = !context && intRegex.test(context.source);
     const isBigInt = isBigNumber && isInt;
 
     if (isBigInt) return BigInt(context.source);
@@ -124,23 +147,7 @@ const JSONParse = (text, reviver) => {
     }
   );
 
-  // Convert marked big numbers to BigInt
-  return originalParse(serializedData, (key, value, context) => {
-    const isCustomFormatBigInt =
-      typeof value === "string" && Boolean(value.match(customFormat));
-
-    if (isCustomFormatBigInt)
-      return BigInt(value.substring(0, value.length - 1));
-
-    const isNoiseValue =
-      typeof value === "string" && Boolean(value.match(noiseValue));
-
-    if (isNoiseValue) return value.substring(0, value.length - 1); // Remove one "n" off the end of the noisy string
-
-    if (typeof reviver !== "function") return value;
-
-    return reviver(key, value, context);
-  });
+  return originalParse(serializedData, convertMarkedBigIntsReviver);
 };
 
 export { JSONStringify, JSONParse };
