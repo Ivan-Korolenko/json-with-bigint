@@ -1,7 +1,7 @@
 // ------ Performance tests ------
 
 import { performance } from "perf_hooks";
-import { imitateJSONParseWithoutContext } from "./helpers.mjs";
+import { imitateJSONParseWithoutContext } from "./helpers.cjs";
 import { JSONParse, JSONStringify } from "../json-with-bigint.js";
 
 import { promises as fs } from "fs";
