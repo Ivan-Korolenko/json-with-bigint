@@ -2,10 +2,10 @@ const noiseValue = /^-?\d+n+$/; // Noise - strings that match the custom format 
 const originalStringify = JSON.stringify;
 const originalParse = JSON.parse;
 
-/*
-  Function to serialize value to a JSON string.
-  Converts BigInt values to a custom format (strings with digits and "n" at the end) and then converts them to proper big integers in a JSON string.
-*/
+/**
+ * Function to serialize value to a JSON string.
+ * Converts BigInt values to a custom format (strings with digits and "n" at the end) and then converts them to proper big integers in a JSON string.
+ */
 export const JSONStringify = (value, replacer, space) => {
   if ("rawJSON" in JSON) {
     return originalStringify(
@@ -51,11 +51,12 @@ export const JSONStringify = (value, replacer, space) => {
   return denoisedJSON;
 };
 
-/*
-  Function to check if the JSON.parse's context.source feature is supported.
-*/
-const isContextSourceSupported = () =>
-  JSON.parse("1", (_, __, context) => !!context && context.source === "1");
+/**
+ * Support for JSON.parse's context.source feature detection.
+ * @type {boolean}
+ */
+const contextSourceSupported = (() =>
+  JSON.parse("1", (_, __, context) => !!context && context.source === "1"))();
 
 /*
   Faster (2x) and simpler function to parse JSON.
@@ -88,7 +89,7 @@ const JSONParseV2 = (text, reviver) => {
 export const JSONParse = (text, reviver) => {
   if (!text) return originalParse(text, reviver);
 
-  if (isContextSourceSupported()) return JSONParseV2(text, reviver); // Shortcut to a faster (2x) and simpler version
+  if (contextSourceSupported) return JSONParseV2(text, reviver); // Shortcut to a faster (2x) and simpler version
 
   const MAX_INT = Number.MAX_SAFE_INTEGER.toString();
   const MAX_DIGITS = MAX_INT.length;
