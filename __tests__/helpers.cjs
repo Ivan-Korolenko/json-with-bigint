@@ -8,3 +8,4 @@ const imitateJSONParseWithoutContext = (text, reviver) => {
 };
 
 module.exports = { originalParse, imitateJSONParseWithoutContext };
+module.exports.default = { originalParse, imitateJSONParseWithoutContext };
