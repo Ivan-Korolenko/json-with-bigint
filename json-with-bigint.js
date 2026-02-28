@@ -2,6 +2,7 @@ const intRegex = /^-?\d+$/;
 const noiseValue = /^-?\d+n+$/; // Noise - strings that match the custom format before being converted to it
 const originalStringify = JSON.stringify;
 const originalParse = JSON.parse;
+const customFormat = /^-?\d+n$/;
 
 const bigIntsStringify = /([\[:])?"(-?\d+)n"($|([\\n]|\s)*(\s|[\\n])*[,\}\]])/g;
 const noiseStringify =
@@ -74,20 +75,16 @@ const isContextSourceSupported = () =>
  * Convert marked big numbers to BigInt
  * @type {Reviver}
  */
-const convertMarkedBigIntsReviver = (key, value, context) => {
+const convertMarkedBigIntsReviver = (key, value, context, userReviver) => {
   const isCustomFormatBigInt =
-    typeof value === "string" && Boolean(value.match(customFormat));
+    typeof value === "string" && value.match(customFormat);
+  if (isCustomFormatBigInt) return BigInt(value.slice(0, -1));
 
-  if (isCustomFormatBigInt) return BigInt(value.substring(0, value.length - 1));
+  const isNoiseValue = typeof value === "string" && value.match(noiseValue);
+  if (isNoiseValue) return value.slice(0, -1);
 
-  const isNoiseValue =
-    typeof value === "string" && Boolean(value.match(noiseValue));
-
-  if (isNoiseValue) return value.substring(0, value.length - 1); // Remove one "n" off the end of the noisy string
-
-  if (typeof reviver !== "function") return value;
-
-  return reviver(key, value, context);
+  if (typeof userReviver !== "function") return value;
+  return userReviver(key, value, context);
 };
 
 /**
@@ -116,7 +113,6 @@ const MAX_DIGITS = MAX_INT.length;
 const stringsOrLargeNumbers =
   /"(?:\\.|[^"])*"|-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+-]?[0-9]+)?/g;
 const noiseValueWithQuotes = /^"-?\d+n+"$/; // Noise - strings that match the custom format before being converted to it
-const customFormat = /^-?\d+n$/;
 
 /**
  * Function to parse JSON.
@@ -150,7 +146,9 @@ const JSONParse = (text, reviver) => {
     },
   );
 
-  return originalParse(serializedData, convertMarkedBigIntsReviver);
+  return originalParse(serializedData, (key, value, context) =>
+    convertMarkedBigIntsReviver(key, value, context, reviver),
+  );
 };
 
 export { JSONStringify, JSONParse };
