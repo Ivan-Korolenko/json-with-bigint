@@ -4,7 +4,8 @@ const originalStringify = JSON.stringify;
 const originalParse = JSON.parse;
 
 const bigIntsStringify = /([\[:])?"(-?\d+)n"($|([\\n]|\s)*(\s|[\\n])*[,\}\]])/g;
-const noiseStringify = /([\[:])?("-?\d+n+)n("$|"([\\n]|\s)*(\s|[\\n])*[,\}\]])/g;
+const noiseStringify =
+  /([\[:])?("-?\d+n+)n("$|"([\\n]|\s)*(\s|[\\n])*[,\}\]])/g;
 
 /** @typedef {(key: string, value: any, context?: { source: string }) => any} Reviver */
 
@@ -12,9 +13,9 @@ const noiseStringify = /([\[:])?("-?\d+n+)n("$|"([\\n]|\s)*(\s|[\\n])*[,\}\]])/g
  * Function to serialize value to a JSON string.
  * Converts BigInt values to a custom format (strings with digits and "n" at the end) and then converts them to proper big integers in a JSON string.
  * @param {*} value - The value to convert to a JSON string.
- * @param {function|array} [replacer] - The replacer parameter for JSON.stringify.
- * @param {string|number} [space] - The space parameter for JSON.stringify.
- * @returns {string} The JSON string representation of the value, with BigInt values properly converted.
+ * @param {(Function|Array<string>|null)} [replacer] - A function that alters the behavior of the stringification process, or an array of strings to indicate properties to exclude.
+ * @param {(string|number)} [space] - A string or number to specify indentation or pretty-printing.
+ * @returns {string} The JSON string representation.
  */
 const JSONStringify = (value, replacer, space) => {
   if ("rawJSON" in JSON) {
@@ -29,7 +30,7 @@ const JSONStringify = (value, replacer, space) => {
 
         return value;
       },
-      space
+      space,
     );
   }
 
@@ -51,9 +52,12 @@ const JSONStringify = (value, replacer, space) => {
 
       return value;
     },
-    space
+    space,
   );
-  const processedJSON = convertedToCustomJSON.replace(bigIntsStringify, "$1$2$3"); // Delete one "n" off the end of every BigInt value
+  const processedJSON = convertedToCustomJSON.replace(
+    bigIntsStringify,
+    "$1$2$3",
+  ); // Delete one "n" off the end of every BigInt value
   const denoisedJSON = processedJSON.replace(noiseStringify, "$1$2$3"); // Remove one "n" off the end of every noisy string
 
   return denoisedJSON;
@@ -63,29 +67,28 @@ const JSONStringify = (value, replacer, space) => {
  * Support for JSON.parse's context.source feature detection.
  * @type {boolean}
  */
-const contextSourceSupported = (() =>
-  JSON.parse("1", (_, __, context) => !!context && context.source === "1"))();
+const isContextSourceSupported = () =>
+  JSON.parse("1", (_, __, context) => !!context && context.source === "1");
 
-/** 
+/**
  * Convert marked big numbers to BigInt
  * @type {Reviver}
  */
-function convertMarkedBigIntsReviver(key, value, context) {
-    const isCustomFormatBigInt =
-      typeof value === "string" && Boolean(value.match(customFormat));
+const convertMarkedBigIntsReviver = (key, value, context) => {
+  const isCustomFormatBigInt =
+    typeof value === "string" && Boolean(value.match(customFormat));
 
-    if (isCustomFormatBigInt)
-      return BigInt(value.substring(0, value.length - 1));
+  if (isCustomFormatBigInt) return BigInt(value.substring(0, value.length - 1));
 
-    const isNoiseValue =
-      typeof value === "string" && Boolean(value.match(noiseValue));
+  const isNoiseValue =
+    typeof value === "string" && Boolean(value.match(noiseValue));
 
-    if (isNoiseValue) return value.substring(0, value.length - 1); // Remove one "n" off the end of the noisy string
+  if (isNoiseValue) return value.substring(0, value.length - 1); // Remove one "n" off the end of the noisy string
 
-    if (typeof reviver !== "function") return value;
+  if (typeof reviver !== "function") return value;
 
-    return reviver(key, value, context);
-  }
+  return reviver(key, value, context);
+};
 
 /**
  * Faster (2x) and simpler function to parse JSON.
@@ -97,7 +100,7 @@ const JSONParseV2 = (text, reviver) => {
     const isBigNumber =
       typeof value === "number" &&
       (value > Number.MAX_SAFE_INTEGER || value < Number.MIN_SAFE_INTEGER);
-    const isInt = !context && intRegex.test(context.source);
+    const isInt = context && intRegex.test(context.source);
     const isBigInt = isBigNumber && isInt;
 
     if (isBigInt) return BigInt(context.source);
@@ -108,22 +111,22 @@ const JSONParseV2 = (text, reviver) => {
   });
 };
 
-  const MAX_INT = Number.MAX_SAFE_INTEGER.toString();
-  const MAX_DIGITS = MAX_INT.length;
-  const stringsOrLargeNumbers =
-    /"(?:\\.|[^"])*"|-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+-]?[0-9]+)?/g;
-  const noiseValueWithQuotes = /^"-?\d+n+"$/; // Noise - strings that match the custom format before being converted to it
-  const customFormat = /^-?\d+n$/;
+const MAX_INT = Number.MAX_SAFE_INTEGER.toString();
+const MAX_DIGITS = MAX_INT.length;
+const stringsOrLargeNumbers =
+  /"(?:\\.|[^"])*"|-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+-]?[0-9]+)?/g;
+const noiseValueWithQuotes = /^"-?\d+n+"$/; // Noise - strings that match the custom format before being converted to it
+const customFormat = /^-?\d+n$/;
 
 /**
  * Function to parse JSON.
  * If JSON has number values greater than Number.MAX_SAFE_INTEGER, we convert those values to a custom format, then parse them to BigInt values.
  * Other types of values are not affected and parsed as native JSON.parse() would parse them.
-  */
+ */
 const JSONParse = (text, reviver) => {
   if (!text) return originalParse(text, reviver);
 
-  if (contextSourceSupported) return JSONParseV2(text, reviver); // Shortcut to a faster (2x) and simpler version
+  if (isContextSourceSupported()) return JSONParseV2(text, reviver); // Shortcut to a faster (2x) and simpler version
 
   // Find and mark big numbers with "n"
   const serializedData = text.replace(
@@ -144,7 +147,7 @@ const JSONParse = (text, reviver) => {
         return text;
 
       return '"' + text + 'n"';
-    }
+    },
   );
 
   return originalParse(serializedData, convertMarkedBigIntsReviver);

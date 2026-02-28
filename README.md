@@ -28,6 +28,8 @@ JSONParse(JSONStringify(data)).bigNumber === 9007199254740992n // true
 
 ✔️ Parsed big number values are just regular BigInt. Parses and stringifies all other values other than big numbers the same way as native JSON methods in JS do. Signatures match too. You can just replace every `JSON.parse()` and `JSON.strinfigy()` in your project with `JSONParse()` and `JSONStringify()`, and it will work
 
+✔️ Supports modern features (context.source, rawJSON, etc.)
+
 ✔️ Correctly parses float numbers and negative numbers
 
 ✔️ Correctly parses pretty printed JSON (formatted with newline and whitespace characters)
@@ -44,7 +46,7 @@ JSONParse(JSONStringify(data)).bigNumber === 9007199254740992n // true
 
 ✔️ Actively supported
 
-✔️ Size: 944 bytes (minified and gzipped)
+✔️ Size: 1084 bytes (minified and gzipped)
 
 ✔️ No dependencies. Even the dev ones
 

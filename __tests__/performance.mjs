@@ -18,23 +18,22 @@ async function fetchJSON(url, maxRetries = 3, delay = 1000) {
     try {
       const response = await new Promise((resolve, reject) => {
         get(url, (res) => {
-            if (res.statusCode >= 500 && res.statusCode < 600) {
-              reject(new Error(`Server error ${res.statusCode}: Retrying...`));
-            } else if (res.statusCode !== 200) {
-              reject(
-                new Error(
-                  `Request failed with status ${res.statusCode} ${res.statusMessage}`
-                )
-              );
-            }
+          if (res.statusCode >= 500 && res.statusCode < 600) {
+            reject(new Error(`Server error ${res.statusCode}: Retrying...`));
+          } else if (res.statusCode !== 200) {
+            reject(
+              new Error(
+                `Request failed with status ${res.statusCode} ${res.statusMessage}`,
+              ),
+            );
+          }
 
-            let data = "";
-            res.on("data", (chunk) => {
-              data += chunk;
-            });
-            res.on("end", () => resolve(data));
-          })
-          .on("error", reject);
+          let data = "";
+          res.on("data", (chunk) => {
+            data += chunk;
+          });
+          res.on("end", () => resolve(data));
+        }).on("error", reject);
       });
 
       return JSON.parse(response);
@@ -42,7 +41,7 @@ async function fetchJSON(url, maxRetries = 3, delay = 1000) {
       if (attempt < maxRetries) {
         console.warn(`Attempt ${attempt} failed: ${error.message}`);
         await new Promise((res) =>
-          setTimeout(res, delay * Math.pow(2, attempt - 1))
+          setTimeout(res, delay * Math.pow(2, attempt - 1)),
         ); // Exponential backoff
       } else {
         console.error("Max retries reached. Fetch failed:", error);
@@ -82,11 +81,11 @@ async function readPerformanceJSON(
   filePath,
   encoding,
   maxAttempts = 3,
-  attempt = 0
+  attempt = 0,
 ) {
   if (attempt === maxAttempts)
     throw new Error(
-      `Reading performance JSON failed after ${attempt} attempts. Check download URL, file availability on that URL, and local filepath`
+      `Reading performance JSON failed after ${attempt} attempts. Check download URL, file availability on that URL, and local filepath`,
     );
 
   try {
@@ -96,7 +95,7 @@ async function readPerformanceJSON(
   } catch (error) {
     if (error.code === "ENOENT") {
       console.log(
-        `File not found. Downloading... (Attempt ${attempt + 1}/${maxAttempts})`
+        `File not found. Downloading... (Attempt ${attempt + 1}/${maxAttempts})`,
       );
       await fetchAndSaveJSON(JSON_URL, filePath);
 
@@ -104,7 +103,7 @@ async function readPerformanceJSON(
         filePath,
         encoding,
         maxAttempts,
-        attempt + 1
+        attempt + 1,
       );
     } else {
       console.error("Error reading file:", error);
