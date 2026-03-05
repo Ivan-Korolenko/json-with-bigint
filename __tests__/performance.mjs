@@ -123,17 +123,17 @@ const measureExecTime = (fn) => {
 };
 
 const runTests = (data) => {
+  console.log("___________");
+  console.log("Performance test. One-way");
   measureExecTime(() => {
-    console.log("___________");
-    console.log("Performance test. One-way");
     JSONParse(data);
   });
 
-  measureExecTime(() => {
-    console.log("___________");
-    console.log("Performance test. Round-trip");
-    JSONStringify(JSONParse(data));
-  });
+  // console.log("___________");
+  // console.log("Performance test. Round-trip");
+  // measureExecTime(() => {
+  //   JSONStringify(JSONParse(data));
+  // });
 };
 
 async function main() {
