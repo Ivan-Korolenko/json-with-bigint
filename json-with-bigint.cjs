@@ -112,7 +112,7 @@ function isBigNumber(value) {
  * Based on JSON.parse's context.source feature, which is not universally available now.
  * Does not support the legacy custom format, used in the first version of this library.
  */
-const JSONParseV2 = (text, reviver = passthroughReviver) => {
+const JSONParseWithContext = (text, reviver = passthroughReviver) => {
   if (!text) return originalParse(text, reviver);
   return JSON.parse(text, (key, value, context) => {
       return (context && intRegex.test(context.source) && isBigNumber(value))
@@ -133,10 +133,8 @@ const noiseValueWithQuotes = /^"-?\d+n+"$/; // Noise - strings that match the cu
  * If JSON has number values greater than Number.MAX_SAFE_INTEGER, we convert those values to a custom format, then parse them to BigInt values.
  * Other types of values are not affected and parsed as native JSON.parse() would parse them.
  */
-const JSONParse = (text, reviver) => {
+const JSONParseClassic = (text, reviver) => {
   if (!text) return originalParse(text, reviver);
-
-  if (contextSourceSupported) return JSONParseV2(text, reviver); // Shortcut to a faster (2x) and simpler version
 
   // Find and mark big numbers with "n"
   const serializedData = text.replace(
@@ -164,5 +162,7 @@ const JSONParse = (text, reviver) => {
     convertMarkedBigIntsReviver(key, value, context, reviver),
   );
 };
+
+const JSONParse = contextSourceSupported ? JSONParseWithContext : JSONParseClassic;
 
 module.exports = { JSONStringify, JSONParse };
