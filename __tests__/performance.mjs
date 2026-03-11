@@ -129,11 +129,11 @@ const runTests = (data) => {
     JSONParse(data);
   });
 
-  // console.log("___________");
-  // console.log("Performance test. Round-trip");
-  // measureExecTime(() => {
-  //   JSONStringify(JSONParse(data));
-  // });
+  console.log("___________");
+  console.log("Performance test. Round-trip");
+  measureExecTime(() => {
+    JSONStringify(JSONParse(data));
+  });
 };
 
 async function main() {

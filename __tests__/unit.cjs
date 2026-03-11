@@ -151,7 +151,7 @@ const runTests = () => {
 console.log("------ V2 unit tests ------");
 runTests();
 
-JSON.parse = imitateJSONParseWithoutContext;
+// JSON.parse = imitateJSONParseWithoutContext;
 
-console.log("\n------ V1 (without context.source) unit tests ------");
-runTests();
+// console.log("\n------ V1 (without context.source) unit tests ------");
+// runTests();

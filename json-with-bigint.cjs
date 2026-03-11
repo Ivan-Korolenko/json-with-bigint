@@ -8,7 +8,11 @@ const bigIntsStringify = /([\[:])?"(-?\d+)n"($|([\\n]|\s)*(\s|[\\n])*[,\}\]])/g;
 const noiseStringify =
   /([\[:])?("-?\d+n+)n("$|"([\\n]|\s)*(\s|[\\n])*[,\}\]])/g;
 
+const passthroughReplacer = (key, value) => value;
+const passthroughReviver = (key, value, context) => value;
+
 /** @typedef {(key: string, value: any, context?: { source: string }) => any} Reviver */
+/** @typedef {(key: string, value: any, context: { source: string } | undefined, reviver: Reviver) => any } ExtendedReviver */
 
 /**
  * Function to serialize value to a JSON string.
@@ -37,21 +41,25 @@ const JSONStringify = (value, replacer, space) => {
 
   if (!value) return originalStringify(value, replacer, space);
 
+  if (Array.isArray(replacer)) {
+    const _replacerArray = replacer;
+    replacer = (key, value) => (_replacerArray.includes(key) ? value : undefined);
+  } else if (typeof replacer !== "function") {
+    replacer = passthroughReplacer;
+  }
+
   const convertedToCustomJSON = originalStringify(
     value,
     (key, value) => {
-      const isNoise =
-        typeof value === "string" && noiseValue.test(value);
-
-      if (isNoise) return value.toString() + "n"; // Mark noise values with additional "n" to offset the deletion of one "n" during the processing
-
-      if (typeof value === "bigint") return value.toString() + "n";
-
-      if (typeof replacer === "function") return replacer(key, value);
-
-      if (Array.isArray(replacer) && replacer.includes(key)) return value;
-
-      return value;
+      switch (typeof value) {
+        case "string": {
+          return noiseValue.test(value) ? value + "n" : value; // Mark noise values with additional "n" to offset the deletion of one "n" during the processing
+        }
+        case "bigint":
+          return value.toString() + "n";
+        default:
+          return replacer(key, value);
+      }
     },
     space,
   );
@@ -68,12 +76,12 @@ const JSONStringify = (value, replacer, space) => {
  * Support for JSON.parse's context.source feature detection.
  * @type {boolean}
  */
-const isContextSourceSupported = () =>
-  JSON.parse("1", (_, __, context) => !!context && context.source === "1");
+const contextSourceSupported = (() =>
+  JSON.parse("1", (_, __, context) => !!context && context.source === "1"))();
 
 /**
  * Convert marked big numbers to BigInt
- * @type {Reviver}
+ * @type {ExtendedReviver}
  */
 const convertMarkedBigIntsReviver = (key, value, context, userReviver) => {
   const isCustomFormatBigInt =
@@ -88,24 +96,30 @@ const convertMarkedBigIntsReviver = (key, value, context, userReviver) => {
 };
 
 /**
+ * Wether a value is a big number that should be converted to BigInt.
+ *
+ * @param {number} value 
+ * @returns {value is number}
+ */
+function isBigNumber(value) {
+  return (
+    (value > Number.MAX_SAFE_INTEGER || value < Number.MIN_SAFE_INTEGER)
+  );
+}
+
+/**
  * Faster (2x) and simpler function to parse JSON.
  * Based on JSON.parse's context.source feature, which is not universally available now.
  * Does not support the legacy custom format, used in the first version of this library.
  */
-const JSONParseV2 = (text, reviver) => {
+const JSONParseV2 = (text, reviver = passthroughReviver) => {
+  if (!text) return originalParse(text, reviver);
   return JSON.parse(text, (key, value, context) => {
-    const isBigNumber =
-      typeof value === "number" &&
-      (value > Number.MAX_SAFE_INTEGER || value < Number.MIN_SAFE_INTEGER);
-    const isInt = context && intRegex.test(context.source);
-    const isBigInt = isBigNumber && isInt;
-
-    if (isBigInt) return BigInt(context.source);
-
-    if (typeof reviver !== "function") return value;
-
-    return reviver(key, value, context);
-  });
+      return (context && intRegex.test(context.source) && isBigNumber(value))
+        ? BigInt(context.source)
+        : reviver(key, value, context);
+    }
+  );
 };
 
 const MAX_INT = Number.MAX_SAFE_INTEGER.toString();
@@ -122,7 +136,7 @@ const noiseValueWithQuotes = /^"-?\d+n+"$/; // Noise - strings that match the cu
 const JSONParse = (text, reviver) => {
   if (!text) return originalParse(text, reviver);
 
-  if (isContextSourceSupported()) return JSONParseV2(text, reviver); // Shortcut to a faster (2x) and simpler version
+  if (contextSourceSupported) return JSONParseV2(text, reviver); // Shortcut to a faster (2x) and simpler version
 
   // Find and mark big numbers with "n"
   const serializedData = text.replace(
