@@ -1,8 +1,7 @@
 // ------ Performance tests ------
 
 const { performance } = require("perf_hooks");
-const { imitateJSONParseWithoutContext } = require("./helpers.cjs");
-const { JSONParse, JSONStringify } = require("../json-with-bigint.cjs");
+const { JSONParseFactory, JSONStringify } = require("../json-with-bigint.cjs");
 
 const fs = require("fs").promises;
 const https = require("https");
@@ -124,16 +123,16 @@ const measureExecTime = (fn) => {
   console.log("Time: ", endTime - startTime);
 };
 
-const runTests = (data) => {
+const runTests = (JSONParse, data) => {
+  console.log("___________");
+  console.log("Performance test. One-way");
   measureExecTime(() => {
-    console.log("___________");
-    console.log("Performance test. One-way");
     JSONParse(data);
   });
 
+  console.log("___________");
+  console.log("Performance test. Round-trip");
   measureExecTime(() => {
-    console.log("___________");
-    console.log("Performance test. Round-trip");
     JSONStringify(JSONParse(data));
   });
 };
@@ -142,12 +141,10 @@ async function main() {
   const data = await readPerformanceJSON(JSON_LOCAL_FILEPATH, "utf8");
 
   console.log("------ V2 performance tests ------");
-  runTests(data);
-
-  JSON.parse = imitateJSONParseWithoutContext;
+  runTests(JSONParseFactory({ useContextSource: true }), data);
 
   console.log("\n------ V1 (without context.source) performance tests ------");
-  runTests(data);
+  runTests(JSONParseFactory({ useContextSource: false }), data);
 }
 
 main();

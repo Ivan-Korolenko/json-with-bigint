@@ -1,8 +1,9 @@
+"use strict";
+
 // ------ Unit tests ------
 
 const assert = require("assert");
-const { imitateJSONParseWithoutContext } = require("./helpers.cjs");
-const { JSONStringify, JSONParse } = require("../json-with-bigint.cjs");
+const { JSONStringify, JSONParseFactory } = require("../json-with-bigint.cjs");
 
 const test1JSON = `{"zero":9007199254740998,"one":-42,"two":-9007199254740998,"test":["He was\\":[-23432432432434324324324324]",111,9007199254740998,{"test2":-9007199254740998}],"test3":["He was:[-23432432432434324324324324]",111,9007199254740998,{"test2":-9007199254740998,"float":1.9007199254740998,"float2":0.1,"float3":2.9007199254740996,"int":1,"int2":3243243432432434324324324}],"float4":[1.9007199254740998,1111111111111111111111111111111111,0.1,1,54354654654654654654656546546546546]}`;
 const test1Obj = {
@@ -106,7 +107,10 @@ const test7Obj = [
 const test8Obj = { uid: BigInt("1308537228663099396") };
 const test8JSON = '{\n  "uid": 1308537228663099396\n}';
 
-const runTests = () => {
+/**
+ * @param {typeof JSON.parse} JSONParse
+ */
+const runTests = (JSONParse) => {
   assert.deepStrictEqual(JSONParse(test1JSON), test1Obj);
   console.log("1 test passed");
   assert.deepStrictEqual(JSONStringify(JSONParse(test1JSON)), test1JSON);
@@ -149,9 +153,7 @@ const runTests = () => {
 };
 
 console.log("------ V2 unit tests ------");
-runTests();
-
-JSON.parse = imitateJSONParseWithoutContext;
+runTests(JSONParseFactory({ useContextSource: true }));
 
 console.log("\n------ V1 (without context.source) unit tests ------");
-runTests();
+runTests(JSONParseFactory({ useContextSource: false }));

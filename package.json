@@ -9,6 +9,8 @@
     "require": "./json-with-bigint.cjs"
   },
   "scripts": {
+    "build:cjs": "node ./scripts/build-cjs.js",
+    "lint": "biome lint",
     "test": "npm run unit:cjs && npm run unit:esm",
     "performance:cjs": "node __tests__/performance.cjs",
     "unit:cjs": "node __tests__/unit.cjs",
