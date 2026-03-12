@@ -1,8 +1,7 @@
 // ------ Performance tests ------
 
 import { performance } from "perf_hooks";
-import { imitateJSONParseWithoutContext } from "./helpers.cjs";
-import { JSONParse, JSONStringify } from "../json-with-bigint.js";
+import { JSONParseFactory, JSONStringify } from "../json-with-bigint.cjs";
 
 import { promises as fs } from "fs";
 import { get } from "https";
@@ -18,22 +17,23 @@ async function fetchJSON(url, maxRetries = 3, delay = 1000) {
     try {
       const response = await new Promise((resolve, reject) => {
         get(url, (res) => {
-          if (res.statusCode >= 500 && res.statusCode < 600) {
-            reject(new Error(`Server error ${res.statusCode}: Retrying...`));
-          } else if (res.statusCode !== 200) {
-            reject(
-              new Error(
-                `Request failed with status ${res.statusCode} ${res.statusMessage}`,
-              ),
-            );
-          }
+            if (res.statusCode >= 500 && res.statusCode < 600) {
+              reject(new Error(`Server error ${res.statusCode}: Retrying...`));
+            } else if (res.statusCode !== 200) {
+              reject(
+                new Error(
+                  `Request failed with status ${res.statusCode} ${res.statusMessage}`,
+                ),
+              );
+            }
 
-          let data = "";
-          res.on("data", (chunk) => {
-            data += chunk;
-          });
-          res.on("end", () => resolve(data));
-        }).on("error", reject);
+            let data = "";
+            res.on("data", (chunk) => {
+              data += chunk;
+            });
+            res.on("end", () => resolve(data));
+          })
+          .on("error", reject);
       });
 
       return JSON.parse(response);
@@ -122,7 +122,7 @@ const measureExecTime = (fn) => {
   console.log("Time: ", endTime - startTime);
 };
 
-const runTests = (data) => {
+const runTests = (JSONParse, data) => {
   console.log("___________");
   console.log("Performance test. One-way");
   measureExecTime(() => {
@@ -140,12 +140,10 @@ async function main() {
   const data = await readPerformanceJSON(JSON_LOCAL_FILEPATH, "utf8");
 
   console.log("------ V2 performance tests ------");
-  runTests(data);
-
-  JSON.parse = imitateJSONParseWithoutContext;
+  runTests(JSONParseFactory({ useContextSource: true }), data);
 
   console.log("\n------ V1 (without context.source) performance tests ------");
-  runTests(data);
+  runTests(JSONParseFactory({ useContextSource: false }), data);
 }
 
 main();

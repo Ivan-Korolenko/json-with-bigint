@@ -165,6 +165,18 @@ const JSONParseClassic = (text, reviver) => {
   );
 };
 
-const JSONParse = contextSourceSupported ? JSONParseWithContext : JSONParseClassic;
+/**
+ * @param {Object} [options]
+ * @param {boolean} [options.useContextSource=false] - Whether to use the implementation that relies on JSON.parse's context.source feature, which is faster but not universally supported.
+ * @returns {typeof JSON.parse} JSON.parse function with BigInt support, based on the provided options.
+ */
+const JSONParseFactory = (options) => {
+  if (options && options.useContextSource === true) {
+    return JSONParseWithContext;
+  }
+  return JSONParseClassic;
+};
 
-module.exports = { JSONStringify, JSONParse };
+const JSONParse = JSONParseFactory({ useContextSource: contextSourceSupported });
+
+module.exports = { JSONStringify, JSONParse, JSONParseFactory };
