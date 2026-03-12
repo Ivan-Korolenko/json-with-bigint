@@ -1,3 +1,5 @@
+'use strict';
+
 const intRegex = /^-?\d+$/;
 const noiseValue = /^-?\d+n+$/; // Noise - strings that match the custom format before being converted to it
 const originalStringify = JSON.stringify;
