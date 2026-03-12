@@ -120,10 +120,10 @@ const JSONParseWithContext = (text, reviver = passthroughReviver) => {
   if (!text) return originalParse(text, reviver);
 
   return JSON.parse(text, (key, value, context) => {
-    return (context && intRegex.test(context.source) && isBigNumber(value))
-      ? BigInt(context.source)
-      : reviver(key, value, context);
-  }
+      return (context && intRegex.test(context.source) && isBigNumber(value))
+        ? BigInt(context.source)
+        : reviver(key, value, context);
+    }
   );
 };
 
