@@ -106,6 +106,12 @@ const contextSourceSupported = (() =>
   JSON.parse("1", (_, __, context) => !!context && context.source === "1"))();
 
 /**
+ * Support for JSON.stringify's JSON.rawJSON feature detection.
+ * @type {boolean}
+ */
+const rawJSONSupported = "rawJSON" in JSON;
+
+/**
  * Convert marked big numbers to BigInt
  * @type {ExtendedReviver}
  */
@@ -235,7 +241,7 @@ const JSONParse = JSONParseFactory({
  *   based on the provided options.
  */
 const JSONStringifyFactory = (options) => {
-  if (options && options.useRawJSON === true && "rawJSON" in JSON) {
+  if (options && options.useRawJSON === true && rawJSONSupported) {
     return JSONStringifyRawJSON;
   }
   return JSONStringifyClassic;
@@ -254,6 +260,6 @@ const JSONStringifyFactory = (options) => {
  *   or pretty-printing.
  * @returns {string} The JSON string representation.
  */
-const JSONStringify = JSONStringifyFactory({ useRawJSON: "rawJSON" in JSON });
+const JSONStringify = JSONStringifyFactory({ useRawJSON: rawJSONSupported });
 
 export { JSONStringify, JSONParse, JSONParseFactory };
