@@ -1,3 +1,5 @@
+'use strict';
+
 // ------ Unit tests ------
 
 const assert = require("assert");
