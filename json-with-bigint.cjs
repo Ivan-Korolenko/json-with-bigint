@@ -21,30 +21,18 @@ const passthroughReviver = (key, value, context) => value;
 
 /**
  * Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
- * Supports serialization of BigInt values to a custom format (strings with digits and "n" at the end) in a JSON string.
+ * Supports serialization of BigInt values to a custom format (strings with
+ * digits and "n" at the end) in a JSON string.
  *
  * @param {*} value - The value to convert to a JSON string.
- * @param {(Replacer|Array<string>|null)} [replacer] - A function that alters the behavior of the stringification process, or an array of strings to indicate properties to exclude.
- * @param {(string|number)} [space] - A string or number to specify indentation or pretty-printing.
+ * @param {(Replacer|Array<string>|null)} [replacer] - A function that alters
+ *   the behavior of the stringification process, or an array of strings to
+ *   indicate properties to exclude.
+ * @param {(string|number)} [space] - A string or number to specify indentation
+ *   or pretty-printing.
  * @returns {string} The JSON string representation.
  */
-const JSONStringify = (value, replacer, space) => {
-  if ("rawJSON" in JSON) {
-    return originalStringify(
-      value,
-      (key, value) => {
-        if (typeof value === "bigint") return JSON.rawJSON(value.toString());
-
-        if (typeof replacer === "function") return replacer(key, value);
-
-        if (Array.isArray(replacer) && replacer.includes(key)) return value;
-
-        return value;
-      },
-      space,
-    );
-  }
-
+const JSONStringifyClassic = (value, replacer, space) => {
   if (!value) return originalStringify(value, replacer, space);
 
   if (Array.isArray(replacer)) {
@@ -76,6 +64,40 @@ const JSONStringify = (value, replacer, space) => {
   const denoisedJSON = processedJSON.replace(noiseStringify, "$1$2$3"); // Remove one "n" off the end of every noisy string
 
   return denoisedJSON;
+};
+
+/**
+ * Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
+ * Supports serialization of BigInt values to a custom format (strings with
+ * digits and "n" at the end) in a JSON string.
+ *
+ * @param {*} value - The value to convert to a JSON string.
+ * @param {(Replacer|Array<string>|null)} [replacer] - A function that alters
+ *   the behavior of the stringification process, or an array of strings to
+ *   indicate properties to exclude.
+ * @param {(string|number)} [space] - A string or number to specify indentation
+ *   or pretty-printing.
+ * @returns {string} The JSON string representation.
+ */
+const JSONStringifyRawJSON = (value, replacer, space) => {
+  if (Array.isArray(replacer)) {
+    const _replacerArray = replacer;
+    replacer = (key, value) => (_replacerArray.includes(key) ? value : undefined);
+  } else if (typeof replacer !== "function") {
+    replacer = passthroughReplacer;
+  }
+
+  return originalStringify(
+    value,
+    (key, value) => {
+      if (typeof value === "bigint") return JSON.rawJSON(value.toString());
+
+      if (typeof replacer === "function") return replacer(key, value);
+
+      return replacer(key, value);
+    },
+    space,
+  );
 };
 
 /**
@@ -189,12 +211,48 @@ const JSONParseFactory = (options) => {
 
 /**
  * Converts a JavaScript Object Notation (JSON) string into an object.
- * Supports parsing of big integers in a custom format (strings with digits and "n" at the end) to BigInt values.
+ * Supports parsing of big integers in a custom format (strings with digits and
+ * "n" at the end) to BigInt values.
  * @param {string} text A valid JSON string.
- * @param {Reviver} reviver A function that transforms the results. This function is called for each member of the object.
- * If a member contains nested objects, the nested objects are transformed before the parent object is.
+ * @param {Reviver} reviver A function that transforms the results. This
+ *   function is called for each member of the object.
+ *   If a member contains nested objects, the nested objects are transformed
+ *   before the parent object is.
  * @throws {SyntaxError} If `text` is not valid JSON.
  */
 const JSONParse = JSONParseFactory({ useContextSource: contextSourceSupported });
+
+/**
+ * 
+ * @param {Object} [options]
+ * @param {boolean} [options.useRawJSON=false] - Whether to use the
+ *   implementation that relies on JSON.stringify's JSON.rawJSON feature, which
+ *   is faster but not universally supported. Falling back to the replacer-based
+ *   implementation if JSON.rawJSON is not supported, regardless of the value of
+ *   this option.
+ * @returns {typeof JSON.stringify} JSON.stringify function with BigInt support,
+ *   based on the provided options.
+ */
+const JSONStringifyFactory = (options) => {
+  if (options && options.useRawJSON === true && "rawJSON" in JSON) {
+    return JSONStringifyRawJSON;
+  }
+  return JSONStringifyClassic;
+ }
+
+/**
+ * Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
+ * Supports serialization of BigInt values to a custom format (strings with
+ * digits and "n" at the end) in a JSON string.
+ *
+ * @param {*} value - The value to convert to a JSON string.
+ * @param {(Replacer|Array<string>|null)} [replacer] - A function that alters
+ *   the behavior of the stringification process, or an array of strings to
+ *   indicate properties to exclude.
+ * @param {(string|number)} [space] - A string or number to specify indentation
+ *   or pretty-printing.
+ * @returns {string} The JSON string representation.
+ */
+const JSONStringify = JSONStringifyFactory({ useRawJSON: "rawJSON" in JSON });
 
 module.exports = { JSONStringify, JSONParse, JSONParseFactory };
