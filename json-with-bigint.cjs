@@ -167,11 +167,16 @@ const JSONParseClassic = (text, reviver) => {
 
 /**
  * @param {Object} [options]
- * @param {boolean} [options.useContextSource=false] - Whether to use the implementation that relies on JSON.parse's context.source feature, which is faster but not universally supported.
- * @returns {typeof JSON.parse} JSON.parse function with BigInt support, based on the provided options.
+ * @param {boolean} [options.useContextSource=false] - Whether to use the
+ *   implementation that relies on JSON.parse's context.source feature, which is
+ *   faster but not universally supported. Falling back to the classic
+ *   implementation if context.source is not supported, regardless of the value
+ *   of this option.
+ * @returns {typeof JSON.parse} JSON.parse function with BigInt support, based
+ *   on the provided options.
  */
 const JSONParseFactory = (options) => {
-  if (options && options.useContextSource === true) {
+  if (options && options.useContextSource === true && contextSourceSupported) {
     return JSONParseWithContext;
   }
   return JSONParseClassic;
