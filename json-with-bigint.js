@@ -8,8 +8,8 @@ const bigIntsStringify = /([\[:])?"(-?\d+)n"($|([\\n]|\s)*(\s|[\\n])*[,\}\]])/g;
 const noiseStringify =
   /([\[:])?("-?\d+n+)n("$|"([\\n]|\s)*(\s|[\\n])*[,\}\]])/g;
 
-const passthroughReplacer = (key, value) => value;
-const passthroughReviver = (key, value, context) => value;
+const passthroughReplacer = (_key, value) => value;
+const passthroughReviver = (_key, value, _context) => value;
 
 /** @typedef {(this: any, key: string, value: any) => any} Replacer */
 /** @typedef {(key: string, value: any, context?: { source: string }) => any} Reviver */
@@ -33,7 +33,8 @@ const JSONStringifyClassic = (value, replacer, space) => {
 
   if (Array.isArray(replacer)) {
     const _replacerArray = replacer;
-    replacer = (key, value) => (_replacerArray.includes(key) ? value : undefined);
+    replacer = (key, value) =>
+      _replacerArray.includes(key) ? value : undefined;
   } else if (typeof replacer !== "function") {
     replacer = passthroughReplacer;
   }
@@ -78,7 +79,8 @@ const JSONStringifyClassic = (value, replacer, space) => {
 const JSONStringifyRawJSON = (value, replacer, space) => {
   if (Array.isArray(replacer)) {
     const _replacerArray = replacer;
-    replacer = (key, value) => (_replacerArray.includes(key) ? value : undefined);
+    replacer = (key, value) =>
+      _replacerArray.includes(key) ? value : undefined;
   } else if (typeof replacer !== "function") {
     replacer = passthroughReplacer;
   }
@@ -122,13 +124,11 @@ const convertMarkedBigIntsReviver = (key, value, context, userReviver) => {
 /**
  * Wether a value is a big number that should be converted to BigInt.
  *
- * @param {number} value 
+ * @param {number} value
  * @returns {value is number}
  */
 function isBigNumber(value) {
-  return (
-    (value > Number.MAX_SAFE_INTEGER || value < Number.MIN_SAFE_INTEGER)
-  );
+  return value > Number.MAX_SAFE_INTEGER || value < Number.MIN_SAFE_INTEGER;
 }
 
 /**
@@ -142,11 +142,10 @@ const JSONParseWithContext = (text, reviver = passthroughReviver) => {
   if (!text) return originalParse(text, reviver);
 
   return JSON.parse(text, (key, value, context) => {
-      return (context && intRegex.test(context.source) && isBigNumber(value))
-        ? BigInt(context.source)
-        : reviver(key, value, context);
-    }
-  );
+    return context && intRegex.test(context.source) && isBigNumber(value)
+      ? BigInt(context.source)
+      : reviver(key, value, context);
+  });
 };
 
 const MAX_INT = Number.MAX_SAFE_INTEGER.toString();
@@ -220,10 +219,12 @@ const JSONParseFactory = (options) => {
  *   before the parent object is.
  * @throws {SyntaxError} If `text` is not valid JSON.
  */
-const JSONParse = JSONParseFactory({ useContextSource: contextSourceSupported });
+const JSONParse = JSONParseFactory({
+  useContextSource: contextSourceSupported,
+});
 
 /**
- * 
+ *
  * @param {Object} [options]
  * @param {boolean} [options.useRawJSON=false] - Whether to use the
  *   implementation that relies on JSON.stringify's JSON.rawJSON feature, which
@@ -238,7 +239,7 @@ const JSONStringifyFactory = (options) => {
     return JSONStringifyRawJSON;
   }
   return JSONStringifyClassic;
- }
+};
 
 /**
  * Converts a JavaScript value to a JavaScript Object Notation (JSON) string.

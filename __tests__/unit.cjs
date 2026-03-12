@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 // ------ Unit tests ------
 
@@ -108,7 +108,7 @@ const test8Obj = { uid: BigInt("1308537228663099396") };
 const test8JSON = '{\n  "uid": 1308537228663099396\n}';
 
 /**
- * @param {typeof JSON.parse} JSONParse 
+ * @param {typeof JSON.parse} JSONParse
  */
 const runTests = (JSONParse) => {
   assert.deepStrictEqual(JSONParse(test1JSON), test1Obj);

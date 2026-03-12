@@ -17,23 +17,22 @@ async function fetchJSON(url, maxRetries = 3, delay = 1000) {
     try {
       const response = await new Promise((resolve, reject) => {
         get(url, (res) => {
-            if (res.statusCode >= 500 && res.statusCode < 600) {
-              reject(new Error(`Server error ${res.statusCode}: Retrying...`));
-            } else if (res.statusCode !== 200) {
-              reject(
-                new Error(
-                  `Request failed with status ${res.statusCode} ${res.statusMessage}`,
-                ),
-              );
-            }
+          if (res.statusCode >= 500 && res.statusCode < 600) {
+            reject(new Error(`Server error ${res.statusCode}: Retrying...`));
+          } else if (res.statusCode !== 200) {
+            reject(
+              new Error(
+                `Request failed with status ${res.statusCode} ${res.statusMessage}`,
+              ),
+            );
+          }
 
-            let data = "";
-            res.on("data", (chunk) => {
-              data += chunk;
-            });
-            res.on("end", () => resolve(data));
-          })
-          .on("error", reject);
+          let data = "";
+          res.on("data", (chunk) => {
+            data += chunk;
+          });
+          res.on("end", () => resolve(data));
+        }).on("error", reject);
       });
 
       return JSON.parse(response);
