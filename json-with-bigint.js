@@ -92,8 +92,6 @@ const JSONStringifyRawJSON = (value, replacer, space) => {
     (key, value) => {
       if (typeof value === "bigint") return JSON.rawJSON(value.toString());
 
-      if (typeof replacer === "function") return replacer(key, value);
-
       return replacer(key, value);
     },
     space,
@@ -147,6 +145,11 @@ const isBigNumber = (value) => {
  * available now.
  * Does not support the legacy custom format, used in the first version of this
  * library.
+ * 
+ * @param {typeof JSON.parse} JSONParse - The JSON.parse function to use for
+ *   parsing.
+ * @returns {typeof JSON.parse} A JSON.parse function with BigInt support, based
+ *   on the context.source feature.
  */
 const JSONParseWithContext = (JSONParse) => (text, reviver = passthroughReviver) => {
   if (!text) return originalParse(text, reviver);
@@ -269,7 +272,6 @@ const JSONParse = JSONParseFactory(kAutoDetect);
  */
 const JSONStringifyFactory = (options) => {
   if (options === kAutoDetect) {
-    const JSONStringify = originalStringify;
     return (value, replacer, space) => {
       if (isRawJSONSupported(JSON)) {
         return JSONStringifyRawJSON(value, replacer, space);
@@ -279,18 +281,15 @@ const JSONStringifyFactory = (options) => {
     }
   }
 
-  const JSONStringify = options && options.JSONStringify ? options.JSONStringify : originalStringify;
-  const useRawJSON = options && options.useRawJSON;
-
-  if (useRawJSON === true) {
+  if (options && options.useRawJSON === true) {
     if (!isRawJSONSupported(JSON)) {
       throw new TypeError(
         "The JSON.rawJSON feature is not supported by the provided JSON.stringify implementation, which is required for the JSON.rawJSON-based implementation. Please provide a compatible JSON.stringify or set useRawJSON to false.",
       );
     }
-    return JSONStringifyRawJSON(JSONStringify);
+    return JSONStringifyRawJSON;
   }
-  return JSONStringifyClassic(JSONStringify);
+  return JSONStringifyClassic;
 };
 
 /**

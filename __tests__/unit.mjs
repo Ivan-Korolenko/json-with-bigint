@@ -160,5 +160,38 @@ try {
   }
 }
 
+if (!isContextSourceSupported(JSON.parse)) {
+  console.log("\n------ Context.source-based implementation error handling test ------");
+  try {
+    JSONParseFactory({ useContextSource: true })(test1JSON);
+    throw new Error("Expected an error to be thrown when using context.source-based implementation in an unsupported environment, but no error was thrown.");
+  } catch (error) {
+    if (!(error instanceof TypeError && error.message.includes("context.source"))) {
+      throw error; // Re-throw if the error is not the expected TypeError about context.source
+    }
+  }
+  console.log("Context.source-based implementation error handling test passed");
+}
+
 console.log("\n------ V1 (without context.source) unit tests ------");
 runTests(JSONParseFactory({ useContextSource: false }));
+
+if (isContextSourceSupported(JSON.parse)) {
+  console.log("\n------ V1 vs V2 consistency tests ------");
+  deepStrictEqual(JSONParseFactory({ useContextSource: true })(test1JSON), JSONParseFactory({ useContextSource: false })(test1JSON));
+  console.log("1 test passed");
+  deepStrictEqual(JSONParseFactory({ useContextSource: true })(test2JSON), JSONParseFactory({ useContextSource: false })(test2JSON));
+  console.log("2 test passed");
+  deepStrictEqual(JSONParseFactory({ useContextSource: true })(test3JSON), JSONParseFactory({ useContextSource: false })(test3JSON));
+  console.log("3 test passed");
+  deepStrictEqual(JSONParseFactory({ useContextSource: true })(test4JSON), JSONParseFactory({ useContextSource: false })(test4JSON));
+  console.log("4 test passed");
+  deepStrictEqual(JSONParseFactory({ useContextSource: true })(test5JSON), JSONParseFactory({ useContextSource: false })(test5JSON));
+  console.log("5 test passed");
+  deepStrictEqual(JSONParseFactory({ useContextSource: true })(test6JSON), JSONParseFactory({ useContextSource: false })(test6JSON));
+  console.log("6 test passed");
+  deepStrictEqual(JSONParseFactory({ useContextSource: true })(test7JSON), JSONParseFactory({ useContextSource: false })(test7JSON));
+  console.log("7 test passed");
+  deepStrictEqual(JSONParseFactory({ useContextSource: true })(test8JSON), JSONParseFactory({ useContextSource: false })(test8JSON));
+  console.log("8 test passed");
+}
