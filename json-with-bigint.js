@@ -10,12 +10,14 @@ const bigIntsStringify = /([\[:])?"(-?\d+)n"($|([\\n]|\s)*(\s|[\\n])*[,\}\]])/g;
 const noiseStringify =
   /([\[:])?("-?\d+n+)n("$|"([\\n]|\s)*(\s|[\\n])*[,\}\]])/g;
 
-const passthroughReplacer = (_key, value) => value;
-const passthroughReviver = (_key, value, _context) => value;
-
 /** @typedef {(this: any, key: string, value: any) => any} Replacer */
 /** @typedef {(key: string, value: any, context?: { source: string }) => any} Reviver */
 /** @typedef {(key: string, value: any, context: { source: string } | undefined, reviver: Reviver) => any } ExtendedReviver */
+
+/** @type {Replacer} */
+const passthroughReplacer = (_key, value) => value;
+/** @type {Reviver} */
+const passthroughReviver = (_key, value, _context) => value;
 
 /**
  * Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
@@ -307,7 +309,6 @@ const JSONStringifyFactory = (options) => {
  */
 const JSONStringify = JSONStringifyFactory(kAutoDetect);
 
-export default JSONParse;
 export { isContextSourceSupported };
 export { isRawJSONSupported };
 export { JSONParse };

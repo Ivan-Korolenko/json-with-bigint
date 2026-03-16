@@ -3,7 +3,8 @@
     "target": "es2020",
     "allowJs": true,
     "checkJs": false,
-    "noEmit": true
+    "declaration": true,
+    "emitDeclarationOnly": true
   },
   "include": ["json-with-bigint.js"]
 }
