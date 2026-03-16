@@ -253,12 +253,7 @@ const JSONParseFactory = (options) => {
  * Converts a JavaScript Object Notation (JSON) string into an object.
  * Supports parsing of big integers in a custom format (strings with digits and
  * "n" at the end) to BigInt values.
- * @param {string} text A valid JSON string.
- * @param {Reviver} reviver A function that transforms the results. This
- *   function is called for each member of the object.
- *   If a member contains nested objects, the nested objects are transformed
- *   before the parent object is.
- * @throws {SyntaxError} If `text` is not valid JSON.
+ * @type {typeof JSON.parse}
  */
 const JSONParse = JSONParseFactory(kAutoDetect);
 
@@ -303,13 +298,7 @@ const JSONStringifyFactory = (options) => {
  * Supports serialization of BigInt values to a custom format (strings with
  * digits and "n" at the end) in a JSON string.
  *
- * @param {*} value - The value to convert to a JSON string.
- * @param {(Replacer|Array<string>|null)} [replacer] - A function that alters
- *   the behavior of the stringification process, or an array of strings to
- *   indicate properties to exclude.
- * @param {(string|number)} [space] - A string or number to specify indentation
- *   or pretty-printing.
- * @returns {string} The JSON string representation.
+ * @type {typeof JSON.stringify}
  */
 const JSONStringify = JSONStringifyFactory(kAutoDetect);
 
