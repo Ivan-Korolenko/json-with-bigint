@@ -3,7 +3,7 @@
 // ------ Unit tests ------
 
 const assert = require("assert");
-const { JSONStringify, JSONParseFactory } = require("../json-with-bigint.cjs");
+const { isContextSourceSupported, JSONStringify, JSONParseFactory } = require("../json-with-bigint.cjs");
 
 const test1JSON = `{"zero":9007199254740998,"one":-42,"two":-9007199254740998,"test":["He was\\":[-23432432432434324324324324]",111,9007199254740998,{"test2":-9007199254740998}],"test3":["He was:[-23432432432434324324324324]",111,9007199254740998,{"test2":-9007199254740998,"float":1.9007199254740998,"float2":0.1,"float3":2.9007199254740996,"int":1,"int2":3243243432432434324324324}],"float4":[1.9007199254740998,1111111111111111111111111111111111,0.1,1,54354654654654654654656546546546546]}`;
 const test1Obj = {
@@ -153,7 +153,17 @@ const runTests = (JSONParse) => {
 };
 
 console.log("------ V2 unit tests ------");
-runTests(JSONParseFactory({ useContextSource: true }));
+try {
+  runTests(JSONParseFactory({ useContextSource: true }));
+} catch (error) {
+  if (isContextSourceSupported(JSON.parse)) {
+    throw error; // Re-throw if context.source is supported, because the error is unexpected in that case
+  } else {
+    console.warn(
+      "Context.source is not supported in this environment. Skipping context.source-based implementation tests.",
+    );
+  }
+}
 
 console.log("\n------ V1 (without context.source) unit tests ------");
 runTests(JSONParseFactory({ useContextSource: false }));

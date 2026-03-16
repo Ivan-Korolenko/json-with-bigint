@@ -140,8 +140,14 @@ const runTests = (JSONParse, data) => {
 async function main() {
   const data = await readPerformanceJSON(JSON_LOCAL_FILEPATH, "utf8");
 
-  console.log("------ V2 performance tests ------");
-  runTests(JSONParseFactory({ useContextSource: true }), data);
+  if (isContextSourceSupported(JSON.parse)) {
+    console.log("------ V2 performance tests ------");
+    runTests(JSONParseFactory({ useContextSource: true }), data);
+  } else {
+    console.warn(
+      "Context.source is not supported in this environment. Skipping context.source-based implementation performance tests.",
+    );
+  }
 
   console.log("\n------ V1 (without context.source) performance tests ------");
   runTests(JSONParseFactory({ useContextSource: false }), data);

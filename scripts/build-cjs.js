@@ -8,7 +8,15 @@ const prefix = `"use strict";
 
 `;
 
+const matchExports = esmSource.match(/export\s+{([^}]+)};/);
+if (!matchExports) {
+  throw new Error("Failed to find export statement in the source file.");
+}
+const singleExports = matchExports[1].split(",").map((s) => s.trim()).map((s) => `module.exports.${s} = ${s};`).join("\n");
+
 const cjsSource =
-  prefix + esmSource.replace(/export\s+{([^}]+)};/g, "module.exports = {$1};");
+  prefix + esmSource
+    .replace(/export\s+default\s+([^}]+);/g, `module.exports = $1;\nmodule.exports.default = $1;`)
+    .replace(/export\s+{\s*([^} ]+)\s*};/g, `module.exports.$1 = $1;`);
 
 fs.writeFileSync("./json-with-bigint.cjs", cjsSource, "utf-8");
