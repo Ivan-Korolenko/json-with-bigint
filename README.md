@@ -46,7 +46,7 @@ JSONParse(JSONStringify(data)).bigNumber === 9007199254740992n // true
 
 ✔️ Actively supported
 
-✔️ Size: 2688 bytes (minified and gzipped)
+✔️ Size: 2672 bytes (minified and gzipped)
 
 ✔️ No dependencies. Even the dev ones
 

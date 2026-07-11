@@ -110,10 +110,14 @@ const test8JSON = '{\n  "uid": 1308537228663099396\n}';
 
 function buildDeepNestedJSON(depth) {
   let value = "leaf";
+
   for (let i = 0; i < depth; i++) {
     value = { nested: value };
   }
-  return { name: `deep-nested (${depth})`, json: JSON.stringify(value), value };
+
+  const jsonString = '{"nested":'.repeat(depth) + '"leaf"' + "}".repeat(depth);
+
+  return { name: `deep-nested (${depth})`, json: jsonString, value };
 }
 
 const deepNestedJSON = buildDeepNestedJSON(5000);
