@@ -108,6 +108,16 @@ const test7Obj = [
 const test8Obj = { uid: BigInt("1308537228663099396") };
 const test8JSON = '{\n  "uid": 1308537228663099396\n}';
 
+function buildDeepNestedJSON(depth) {
+  let value = "leaf";
+  for (let i = 0; i < depth; i++) {
+    value = { nested: value };
+  }
+  return { name: `deep-nested (${depth})`, json: JSON.stringify(value), value };
+}
+
+const deepNestedJSON = buildDeepNestedJSON(5000);
+
 const runTests = () => {
   deepStrictEqual(JSONParse(test1JSON), test1Obj);
   console.log("1 test passed");
@@ -148,6 +158,13 @@ const runTests = () => {
   console.log("8 test passed");
   deepStrictEqual(JSONParse(JSONStringify(test8Obj, null, 2)), test8Obj);
   console.log("8 test round-trip passed");
+
+  try {
+    JSONParse(JSONStringify(JSONParse(deepNestedJSON.json)));
+    console.log("Deep nested test passed");
+  } catch (error) {
+    console.log("Deep nested test failed:", error);
+  }
 };
 
 console.log("------ V2 unit tests ------");
