@@ -30,6 +30,8 @@ JSONParse(JSONStringify(data)).bigNumber === 9007199254740992n // true
 
 ✔️ Supports modern features (context.source, rawJSON, etc.)
 
+✔️ If the browser doesn't support the reviver functionality in `JSON.parse`, this library will safely fall back to the implementation that doesn't need it and will continue to work.
+
 ✔️ Correctly parses float numbers and negative numbers
 
 ✔️ Correctly parses pretty printed JSON (formatted with newline and whitespace characters)
